@@ -7,4 +7,4 @@
 - We use `playwright` for browser automation (https://playwright.dev/python/)
     - Run `uv run playwright install` to install browser locally after adding the Python package `pytest-playwright`
 - After all above setup, run `uv run main.py` to run the script
-    ![screenshot](screenshot.png)
+    ![screenshot](https://github.com/RA-Trio/hackernews-interview/blob/main/backend/screenshot.jpg?raw=true)
