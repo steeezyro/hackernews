@@ -8,7 +8,7 @@ function App() {
     fetch("http://localhost:8000/api/results")
       .then((res) => res.json())
       .then((data) => {
-        console.log("Fetched results:", data); // ✅ Debug
+        console.log("Fetched results:", data);
         setResults(data);
       })
       .catch((err) => console.error("Failed to fetch data:", err));
@@ -26,14 +26,22 @@ function App() {
             </a>
             {item.status === "success" ? (
               <img
-                src={`http://localhost:8000/${item.screenshot}`}
+                src={`http://localhost:8000/screenshots/${item.screenshot
+                  .split("/")
+                  .pop()}`}
                 alt={item.title}
+                style={{
+                  width: "100%",
+                  borderRadius: "8px",
+                  marginTop: "0.5rem",
+                }}
               />
             ) : (
               <div className="placeholder">
                 Preview unavailable — site uses custom graphics
               </div>
             )}
+            <p style={{ marginTop: "0.5rem", color: "#ccc" }}>{item.summary}</p>
           </div>
         ))}
       </div>
