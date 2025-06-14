@@ -7,11 +7,33 @@ body {
 }
 
 h1 {
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 2rem;
-  color: #c084fc;
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 2.5rem;
   text-align: center;
+  color: transparent;
+  background: linear-gradient(to right, #c084fc, #818cf8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  letter-spacing: -0.5px;
+  text-shadow: 0 1px 2px rgba(109, 0, 136, 0.562);
+}
+
+.pulse {
+  display: inline-block;
+  animation: pulseEmoji 1.6s infinite ease-in-out;
+}
+
+@keyframes pulseEmoji {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.85;
+  }
 }
 
 .grid {
@@ -28,14 +50,12 @@ h1 {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-
-  /* 🔥 Hover animation */
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .card:hover {
-  transform: scale(1.03);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  transform: scale(1.0075);
+  box-shadow: 0 8px 20px rgba(101, 2, 181, 0.51);
   cursor: pointer;
 }
 
@@ -56,6 +76,10 @@ h1 {
   border-radius: 0.5rem;
   border: 1px solid #52525b;
   width: 100%;
+  background-color: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: transform 0.2s ease;
 }
 
 .placeholder {

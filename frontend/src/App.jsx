@@ -13,14 +13,16 @@ function App() {
 
   const speak = (text) => {
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 1; // Adjust speed (0.1 to 10)
-    utterance.pitch = 1; // Adjust pitch (0 to 2)
+    utterance.rate = 1;
+    utterance.pitch = 1;
     speechSynthesis.speak(utterance);
   };
 
   return (
     <div>
-      <h1>HackerNews Snapshot 📈</h1>
+      <h1>
+        HackerNews Snapshot 📈<span className="pulse">📈</span>
+      </h1>
       <div className="grid">
         {results.map((item, i) => (
           <div key={i} className="card">
@@ -34,11 +36,6 @@ function App() {
                   .split("/")
                   .pop()}`}
                 alt={item.title}
-                style={{
-                  width: "100%",
-                  borderRadius: "8px",
-                  marginTop: "0.5rem",
-                }}
               />
             ) : (
               <div className="placeholder">
