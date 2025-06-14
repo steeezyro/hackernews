@@ -7,12 +7,16 @@ function App() {
   useEffect(() => {
     fetch("http://localhost:8000/api/results")
       .then((res) => res.json())
-      .then((data) => {
-        console.log("Fetched results:", data);
-        setResults(data);
-      })
+      .then((data) => setResults(data))
       .catch((err) => console.error("Failed to fetch data:", err));
   }, []);
+
+  const speak = (text) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1; // Adjust speed (0.1 to 10)
+    utterance.pitch = 1; // Adjust pitch (0 to 2)
+    speechSynthesis.speak(utterance);
+  };
 
   return (
     <div>
@@ -41,7 +45,13 @@ function App() {
                 Preview unavailable — site uses custom graphics
               </div>
             )}
-            <p style={{ marginTop: "0.5rem", color: "#ccc" }}>{item.summary}</p>
+            <p>{item.summary}</p>
+            <button
+              onClick={() => speak(item.summary)}
+              style={{ marginTop: "0.5rem" }}
+            >
+              🔊 Play Summary
+            </button>
           </div>
         ))}
       </div>
