@@ -1,9 +1,19 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 import json
 import os
 
 app = FastAPI()
+
+# ✅ Allow cross-origin requests from frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Use ["*"] only during dev if needed
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/api/results")
 def get_results():
@@ -13,3 +23,4 @@ def get_results():
         return JSONResponse(content=data)
     else:
         return JSONResponse(content={"error": "output.json not found"}, status_code=404)
+
