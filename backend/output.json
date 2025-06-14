@@ -1,0 +1,62 @@
+[
+  {
+    "title": "Implementing Logic Programming",
+    "url": "https://btmc.substack.com/p/implementing-logic-programming",
+    "screenshot": "screenshots/1.png",
+    "status": "success"
+  },
+  {
+    "title": "Self-Adapting Language Models",
+    "url": "https://arxiv.org/abs/2506.10943",
+    "screenshot": "screenshots/2.png",
+    "status": "success"
+  },
+  {
+    "title": "If the moon were only 1 pixel: A tediously accurate solar system model (2014)",
+    "url": "https://joshworth.com/dev/pixelspace/pixelspace_solarsystem.html",
+    "screenshot": null,
+    "status": "failed"
+  },
+  {
+    "title": "OxCaml - a set of extensions to the OCaml programming language.",
+    "url": "https://oxcaml.org/",
+    "screenshot": "screenshots/4.png",
+    "status": "success"
+  },
+  {
+    "title": "Student discovers fungus predicted by Albert Hoffman",
+    "url": "https://wvutoday.wvu.edu/stories/2025/06/02/wvu-student-makes-long-awaited-discovery-of-mystery-fungus-sought-by-lsd-s-inventor",
+    "screenshot": "screenshots/5.png",
+    "status": "success"
+  },
+  {
+    "title": "Whatever Happened to Sandboxfs?",
+    "url": "https://blogsystem5.substack.com/p/whatever-happened-to-sandboxfs",
+    "screenshot": "screenshots/6.png",
+    "status": "success"
+  },
+  {
+    "title": "The International Standard for Identifying Postal Items",
+    "url": "https://www.akpain.net/blog/s10-upu/",
+    "screenshot": "screenshots/7.png",
+    "status": "success"
+  },
+  {
+    "title": "I convinced HP's board to buy Palm and watched them kill it",
+    "url": "https://philmckinney.substack.com/p/i-convinced-hps-board-to-buy-palm",
+    "screenshot": "screenshots/8.png",
+    "status": "success"
+  },
+  {
+    "title": "Meta invests $14.3B in Scale AI to kick-start superintelligence lab",
+    "url": "https://www.nytimes.com/2025/06/12/technology/meta-scale-ai.html",
+    "screenshot": "screenshots/9.png",
+    "status": "success"
+  },
+  {
+    "title": "Using computers more freely and safely (2023)",
+    "url": "https://akkartik.name/freewheeling/",
+    "screenshot": "screenshots/10.png",
+    "status": "success"
+  }
+]
