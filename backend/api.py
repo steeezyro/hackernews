@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 import json
 import os
 
@@ -15,6 +16,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ✅ Serve static screenshots
+app.mount("/screenshots", StaticFiles(directory="screenshots"), name="screenshots")
+
 @app.get("/api/results")
 def get_results():
     if os.path.exists("output.json"):
@@ -23,4 +27,3 @@ def get_results():
         return JSONResponse(content=data)
     else:
         return JSONResponse(content={"error": "output.json not found"}, status_code=404)
-
