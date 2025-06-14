@@ -20,7 +20,7 @@ function App() {
 
   return (
     <div>
-      <h1>🧠 HackerNews Snapshot</h1>
+      <h1>HackerNews Snapshot 📈</h1>
       <div className="grid">
         {results.map((item, i) => (
           <div key={i} className="card">
