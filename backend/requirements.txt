@@ -3,3 +3,12 @@ uvicorn
 python-dotenv
 pillow
 httpx
+python-multipart  
+requests       
+fastapi
+uvicorn[standard]
+google-generativeai
+
+
+
+
