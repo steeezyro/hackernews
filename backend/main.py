@@ -1,18 +1,27 @@
+from fastapi import FastAPI
 from dotenv import load_dotenv
-load_dotenv()
-
 from playwright.sync_api import sync_playwright
 import os
 import shutil
 import json
 import google.generativeai as genai
 
+# Load .env variables
+load_dotenv()
+
 # Configure Gemini API
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 model = genai.GenerativeModel("models/gemini-1.5-flash-latest")
 
+app = FastAPI()
 
-def main():
+@app.get("/")
+def root():
+    return {"message": "Hacker News Summarizer is live!"}
+
+
+@app.get("/run")
+def run_scraper():
     # Clean and prepare screenshots folder
     if os.path.exists("screenshots"):
         shutil.rmtree("screenshots")
@@ -83,12 +92,7 @@ def main():
         browser.close()
 
     # Output JSON
-    print("\n📦 Final JSON Result:")
-    print(json.dumps(results, indent=2))
-
-    # Save to output.json
     with open("output.json", "w") as f:
         json.dump(results, f, indent=2)
 
-if __name__ == "__main__":
-    main()
+    return {"status": "completed", "results": results}
