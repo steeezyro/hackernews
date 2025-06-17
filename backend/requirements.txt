@@ -5,9 +5,9 @@ pillow
 httpx
 python-multipart  
 requests       
-fastapi
 uvicorn[standard]
 google-generativeai
+playwright
 
 
 
