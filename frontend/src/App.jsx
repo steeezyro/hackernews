@@ -4,8 +4,10 @@ import "./index.css";
 function App() {
   const [results, setResults] = useState([]);
 
+  const API_BASE = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
-    fetch("http://localhost:8000/api/results")
+    fetch(`${API_BASE}/api/results`)
       .then((res) => res.json())
       .then((data) => setResults(data))
       .catch((err) => console.error("Failed to fetch data:", err));
@@ -32,7 +34,7 @@ function App() {
             </a>
             {item.status === "success" ? (
               <img
-                src={`http://localhost:8000/screenshots/${item.screenshot
+                src={`${API_BASE}/screenshots/${item.screenshot
                   .split("/")
                   .pop()}`}
                 alt={item.title}
