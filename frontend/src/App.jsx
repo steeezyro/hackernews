@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import "./index.css";
 
+const API_BASE = import.meta.env.VITE_API_URL;
+
 function App() {
   const [results, setResults] = useState([]);
-
-  const API_BASE = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     fetch(`${API_BASE}/api/results`)
