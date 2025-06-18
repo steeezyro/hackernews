@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from playwright.sync_api import sync_playwright
 import os
@@ -16,22 +17,23 @@ model = genai.GenerativeModel("models/gemini-1.5-flash-latest")
 
 app = FastAPI()
 
-# ✅ Allow CORS from your frontend URL
-origins = [
-    "https://hackernews-1.onrender.com"
-]
-
+# 🔒 CORS config (in prod, restrict to your frontend URL)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],  # Or: ["https://hackernews-1.onrender.com"]
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# 🔗 Serve screenshots folder statically
+app.mount("/screenshots", StaticFiles(directory="screenshots"), name="screenshots")
+
+
 @app.get("/")
 def root():
     return {"message": "Hacker News Summarizer is live!"}
+
 
 @app.get("/api/results")
 def run_scraper():
@@ -104,8 +106,8 @@ def run_scraper():
 
         browser.close()
 
-    # Output JSON
+    # Output JSON (optional for logging)
     with open("output.json", "w") as f:
         json.dump(results, f, indent=2)
 
-    return results
+    return {"status": "completed", "results": results}
