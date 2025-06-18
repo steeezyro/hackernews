@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import "./index.css";
 
-const API_BASE = import.meta.env.VITE_API_URL;
-
 function App() {
   const [results, setResults] = useState([]);
+
+  const API_BASE = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     fetch(`${API_BASE}/api/results`)
       .then((res) => res.json())
-      .then((data) => setResults(data))
+      .then((data) => setResults(data.results || []))
       .catch((err) => console.error("Failed to fetch data:", err));
   }, []);
 
@@ -34,9 +34,7 @@ function App() {
             </a>
             {item.status === "success" ? (
               <img
-                src={`${API_BASE}/screenshots/${item.screenshot
-                  .split("/")
-                  .pop()}`}
+                src={`${API_BASE}/${item.screenshot.replace(/\\/g, "/")}`}
                 alt={item.title}
               />
             ) : (
