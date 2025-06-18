@@ -7,16 +7,19 @@ import os
 
 app = FastAPI()
 
-# ✅ Allow cross-origin requests from frontend
+# ✅ FIXED: Allow live frontend + localhost for dev
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Use ["*"] only during dev if needed
+    allow_origins=[
+        "http://localhost:5173",
+        "https://hackernews-1.onrender.com"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ✅ Serve static screenshots
+# ✅ Serve screenshots
 app.mount("/screenshots", StaticFiles(directory="screenshots"), name="screenshots")
 
 @app.get("/api/results")
