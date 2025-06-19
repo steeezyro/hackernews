@@ -9,7 +9,7 @@ function App() {
   useEffect(() => {
     fetch(`${API_BASE}/api/results`)
       .then((res) => res.json())
-      .then((data) => setResults(data.results || []))
+      .then((data) => setResults(data))
       .catch((err) => console.error("Failed to fetch data:", err));
   }, []);
 
