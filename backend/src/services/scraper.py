@@ -24,7 +24,10 @@ class HackerNewsScraper:
         """Scrape top 10 HackerNews stories with parallel processing"""
         try:
             async with async_playwright() as p:
-                browser = await p.chromium.launch(headless=True)
+                browser = await p.chromium.launch(
+                    headless=True,
+                    args=['--no-sandbox', '--disable-dev-shm-usage']
+                )
                 
                 # Get top story links
                 links = await self._get_story_links(browser)
@@ -109,19 +112,27 @@ class HackerNewsScraper:
             created_at=datetime.now()
         )
         
-        # Take screenshot
-        screenshot_success = await self._take_screenshot(browser, idx, url)
-        if screenshot_success:
-            article.screenshot_path = f"{idx}.png"
-            article.status = "success"
-        else:
+        # Try screenshot with better error handling
+        try:
+            screenshot_success = await self._take_screenshot(browser, idx, url)
+            if screenshot_success:
+                article.screenshot_path = f"{idx}.png"
+                article.status = "success"
+            else:
+                article.status = "screenshot_failed"
+        except Exception as e:
+            logger.error(f"Screenshot processing failed for {title}: {e}")
             article.status = "screenshot_failed"
         
-        # Generate summary (run in parallel with screenshot processing)
-        summary = await self._generate_summary(url)
-        article.summary = summary
-        article.updated_at = datetime.now()
+        # Try summary with better error handling
+        try:
+            summary = await self._generate_summary(url)
+            article.summary = summary
+        except Exception as e:
+            logger.warning(f"Summary generation failed for {title}: {e}")
+            article.summary = "AI summary temporarily unavailable (API key issue)."
         
+        article.updated_at = datetime.now()
         return article
 
     async def _take_screenshot(self, browser: Browser, idx: int, url: str) -> bool:
@@ -131,26 +142,37 @@ class HackerNewsScraper:
             # Set viewport for consistent screenshots
             await page.set_viewport_size({"width": 1200, "height": 800})
             
-            await page.goto(url, timeout=30000, wait_until="networkidle")
+            logger.info(f"Taking screenshot of {url}")
+            
+            # Navigate with shorter timeout and better error handling
+            await page.goto(url, timeout=15000, wait_until="domcontentloaded")
+            
+            # Wait a bit for page to load
+            await asyncio.sleep(2)
             
             # Scroll to capture more content
-            await page.evaluate("window.scrollTo(0, document.body.scrollHeight / 3)")
-            await asyncio.sleep(1)  # Wait for any dynamic content
+            await page.evaluate("window.scrollTo(0, Math.min(document.body.scrollHeight / 3, 1000))")
+            await asyncio.sleep(1)
             
             screenshot_path = f"screenshots/{idx}.png"
             os.makedirs("screenshots", exist_ok=True)
             
             await page.screenshot(
                 path=screenshot_path,
-                full_page=False,  # Just above-the-fold for performance
-                quality=80  # Optimize file size
+                full_page=False,
+                type='png'
             )
             
-            logger.info(f"Screenshot saved: {screenshot_path}")
-            return True
+            # Verify file was created
+            if os.path.exists(screenshot_path):
+                logger.info(f"Screenshot saved successfully: {screenshot_path}")
+                return True
+            else:
+                logger.warning(f"Screenshot file not created: {screenshot_path}")
+                return False
             
         except Exception as e:
-            logger.warning(f"Screenshot failed for {url}: {e}")
+            logger.warning(f"Screenshot failed for {url}: {type(e).__name__}: {e}")
             return False
         finally:
             await page.close()
@@ -164,11 +186,15 @@ class HackerNewsScraper:
                 response = await loop.run_in_executor(
                     executor,
                     lambda: self.model.generate_content(
-                        f"Summarize this article in 2-3 concise sentences. Focus on the main points and key takeaways: {url}"
+                        f"Please provide a 2-3 sentence summary of this URL: {url}. Focus on the main topic and key points."
                     )
                 )
             
-            return response.text.strip() if response.text else "Summary not available."
+            if response and hasattr(response, 'text') and response.text:
+                return response.text.strip()
+            else:
+                logger.warning(f"Empty response from Gemini for {url}")
+                return "Summary not available - API returned empty response."
             
         except Exception as e:
             logger.warning(f"Summary generation failed for {url}: {e}")
