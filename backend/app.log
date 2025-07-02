@@ -1,0 +1,138 @@
+2025-07-01 23:17:46 - hackernews - INFO - Application started successfully
+2025-07-01 23:26:22 - hackernews - INFO - Application started successfully
+2025-07-01 23:28:50 - hackernews - INFO - Starting background article refresh
+2025-07-01 23:28:52 - hackernews - ERROR - Background refresh failed: BrowserType.launch: Executable doesn't exist at /Users/rohanchhaya/Library/Caches/ms-playwright/chromium_headless_shell-1179/chrome-mac/headless_shell
+╔════════════════════════════════════════════════════════════╗
+║ Looks like Playwright was just installed or updated.       ║
+║ Please run the following command to download new browsers: ║
+║                                                            ║
+║     playwright install                                     ║
+║                                                            ║
+║ <3 Playwright Team                                         ║
+╚════════════════════════════════════════════════════════════╝
+2025-07-01 23:28:52 - hackernews - INFO - Starting background article refresh
+2025-07-01 23:28:53 - hackernews - ERROR - Background refresh failed: BrowserType.launch: Executable doesn't exist at /Users/rohanchhaya/Library/Caches/ms-playwright/chromium_headless_shell-1179/chrome-mac/headless_shell
+╔════════════════════════════════════════════════════════════╗
+║ Looks like Playwright was just installed or updated.       ║
+║ Please run the following command to download new browsers: ║
+║                                                            ║
+║     playwright install                                     ║
+║                                                            ║
+║ <3 Playwright Team                                         ║
+╚════════════════════════════════════════════════════════════╝
+2025-07-01 23:31:36 - hackernews - INFO - Starting background article refresh
+2025-07-01 23:31:36 - hackernews - ERROR - Background refresh failed: BrowserType.launch: Executable doesn't exist at /Users/rohanchhaya/Library/Caches/ms-playwright/chromium_headless_shell-1179/chrome-mac/headless_shell
+╔════════════════════════════════════════════════════════════╗
+║ Looks like Playwright was just installed or updated.       ║
+║ Please run the following command to download new browsers: ║
+║                                                            ║
+║     playwright install                                     ║
+║                                                            ║
+║ <3 Playwright Team                                         ║
+╚════════════════════════════════════════════════════════════╝
+2025-07-01 23:42:28 - hackernews - INFO - Starting background article refresh
+2025-07-01 23:42:28 - hackernews - ERROR - Background refresh failed: BrowserType.launch: Executable doesn't exist at /Users/rohanchhaya/Library/Caches/ms-playwright/chromium_headless_shell-1179/chrome-mac/headless_shell
+╔════════════════════════════════════════════════════════════╗
+║ Looks like Playwright was just installed or updated.       ║
+║ Please run the following command to download new browsers: ║
+║                                                            ║
+║     playwright install                                     ║
+║                                                            ║
+║ <3 Playwright Team                                         ║
+╚════════════════════════════════════════════════════════════╝
+2025-07-01 23:49:47 - hackernews - INFO - Starting background article refresh
+2025-07-01 23:49:47 - hackernews - ERROR - Background refresh failed: BrowserType.launch: Executable doesn't exist at /Users/rohanchhaya/Library/Caches/ms-playwright/chromium_headless_shell-1179/chrome-mac/headless_shell
+╔════════════════════════════════════════════════════════════╗
+║ Looks like Playwright was just installed or updated.       ║
+║ Please run the following command to download new browsers: ║
+║                                                            ║
+║     playwright install                                     ║
+║                                                            ║
+║ <3 Playwright Team                                         ║
+╚════════════════════════════════════════════════════════════╝
+2025-07-01 23:54:23 - hackernews - INFO - Starting background article refresh
+2025-07-01 23:54:24 - hackernews - ERROR - Background refresh failed: BrowserType.launch: Executable doesn't exist at /Users/rohanchhaya/Library/Caches/ms-playwright/chromium_headless_shell-1179/chrome-mac/headless_shell
+╔════════════════════════════════════════════════════════════╗
+║ Looks like Playwright was just installed or updated.       ║
+║ Please run the following command to download new browsers: ║
+║                                                            ║
+║     playwright install                                     ║
+║                                                            ║
+║ <3 Playwright Team                                         ║
+╚════════════════════════════════════════════════════════════╝
+2025-07-01 23:54:33 - hackernews - INFO - Starting background article refresh
+2025-07-01 23:54:33 - hackernews - ERROR - Background refresh failed: BrowserType.launch: Executable doesn't exist at /Users/rohanchhaya/Library/Caches/ms-playwright/chromium_headless_shell-1179/chrome-mac/headless_shell
+╔════════════════════════════════════════════════════════════╗
+║ Looks like Playwright was just installed or updated.       ║
+║ Please run the following command to download new browsers: ║
+║                                                            ║
+║     playwright install                                     ║
+║                                                            ║
+║ <3 Playwright Team                                         ║
+╚════════════════════════════════════════════════════════════╝
+2025-07-01 23:54:50 - hackernews - INFO - Starting background article refresh
+2025-07-01 23:54:50 - hackernews - ERROR - Background refresh failed: BrowserType.launch: Executable doesn't exist at /Users/rohanchhaya/Library/Caches/ms-playwright/chromium_headless_shell-1179/chrome-mac/headless_shell
+╔════════════════════════════════════════════════════════════╗
+║ Looks like Playwright was just installed or updated.       ║
+║ Please run the following command to download new browsers: ║
+║                                                            ║
+║     playwright install                                     ║
+║                                                            ║
+║ <3 Playwright Team                                         ║
+╚════════════════════════════════════════════════════════════╝
+2025-07-01 23:54:54 - hackernews - INFO - Starting background article refresh
+2025-07-01 23:54:55 - hackernews - ERROR - Background refresh failed: BrowserType.launch: Executable doesn't exist at /Users/rohanchhaya/Library/Caches/ms-playwright/chromium_headless_shell-1179/chrome-mac/headless_shell
+╔════════════════════════════════════════════════════════════╗
+║ Looks like Playwright was just installed or updated.       ║
+║ Please run the following command to download new browsers: ║
+║                                                            ║
+║     playwright install                                     ║
+║                                                            ║
+║ <3 Playwright Team                                         ║
+╚════════════════════════════════════════════════════════════╝
+2025-07-01 23:55:42 - hackernews - INFO - Application shutting down
+2025-07-01 23:56:01 - hackernews - INFO - Application started successfully
+2025-07-01 23:56:14 - hackernews - INFO - Starting background article refresh
+2025-07-01 23:56:14 - hackernews - ERROR - Background refresh failed: BrowserType.launch: Executable doesn't exist at /Users/rohanchhaya/Library/Caches/ms-playwright/chromium_headless_shell-1179/chrome-mac/headless_shell
+╔════════════════════════════════════════════════════════════╗
+║ Looks like Playwright was just installed or updated.       ║
+║ Please run the following command to download new browsers: ║
+║                                                            ║
+║     playwright install                                     ║
+║                                                            ║
+║ <3 Playwright Team                                         ║
+╚════════════════════════════════════════════════════════════╝
+2025-07-01 23:56:19 - hackernews - INFO - Starting background article refresh
+2025-07-01 23:56:19 - hackernews - ERROR - Background refresh failed: BrowserType.launch: Executable doesn't exist at /Users/rohanchhaya/Library/Caches/ms-playwright/chromium_headless_shell-1179/chrome-mac/headless_shell
+╔════════════════════════════════════════════════════════════╗
+║ Looks like Playwright was just installed or updated.       ║
+║ Please run the following command to download new browsers: ║
+║                                                            ║
+║     playwright install                                     ║
+║                                                            ║
+║ <3 Playwright Team                                         ║
+╚════════════════════════════════════════════════════════════╝
+2025-07-01 23:56:23 - hackernews - INFO - Starting background article refresh
+2025-07-01 23:56:23 - hackernews - ERROR - Background refresh failed: BrowserType.launch: Executable doesn't exist at /Users/rohanchhaya/Library/Caches/ms-playwright/chromium_headless_shell-1179/chrome-mac/headless_shell
+╔════════════════════════════════════════════════════════════╗
+║ Looks like Playwright was just installed or updated.       ║
+║ Please run the following command to download new browsers: ║
+║                                                            ║
+║     playwright install                                     ║
+║                                                            ║
+║ <3 Playwright Team                                         ║
+╚════════════════════════════════════════════════════════════╝
+2025-07-01 23:56:58 - hackernews - INFO - Starting background article refresh
+2025-07-01 23:56:59 - hackernews - ERROR - Background refresh failed: BrowserType.launch: Executable doesn't exist at /Users/rohanchhaya/Library/Caches/ms-playwright/chromium_headless_shell-1179/chrome-mac/headless_shell
+╔════════════════════════════════════════════════════════════╗
+║ Looks like Playwright was just installed or updated.       ║
+║ Please run the following command to download new browsers: ║
+║                                                            ║
+║     playwright install                                     ║
+║                                                            ║
+║ <3 Playwright Team                                         ║
+╚════════════════════════════════════════════════════════════╝
+2025-07-02 00:02:28 - hackernews - INFO - Starting background article refresh
+2025-07-02 00:03:06 - hackernews - INFO - Successfully refreshed 10 articles
+2025-07-02 00:04:59 - hackernews - INFO - Starting background article refresh
+2025-07-02 00:05:35 - hackernews - INFO - Successfully refreshed 10 articles

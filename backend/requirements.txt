@@ -1,13 +1,10 @@
-fastapi
-uvicorn
-python-dotenv
-pillow
-httpx
-python-multipart  
-requests       
-uvicorn[standard]
-google-generativeai
-playwright
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+python-dotenv>=1.0.0
+python-multipart>=0.0.6
+google-generativeai>=0.3.0
+playwright>=1.40.0
+aiosqlite>=0.19.0
 
 
 
