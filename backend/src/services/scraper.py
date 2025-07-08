@@ -81,7 +81,7 @@ class HackerNewsScraper:
         
         async def process_single_story(idx: int, title: str, url: str) -> Article:
             async with semaphore:
-                return await self._process_single_story(browser, idx + 1, title, url)
+                return await self._process_single_story(browser, idx, title, url)
         
         tasks = [
             process_single_story(idx, title, url) 
@@ -123,9 +123,9 @@ class HackerNewsScraper:
         
         # Try screenshot and extract content with better error handling
         try:
-            screenshot_success, content = await self._take_screenshot_and_extract_content(browser, idx + 1, url)
+            screenshot_success, content = await self._take_screenshot_and_extract_content(browser, 10 - idx, url)
             if screenshot_success:
-                article.screenshot_path = f"{idx + 1}.png"
+                article.screenshot_path = f"{10 - idx}.png"
                 article.status = "success"
                 page_content = content
             else:
