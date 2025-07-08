@@ -154,8 +154,8 @@ class HackerNewsScraper:
             
             logger.info(f"Taking screenshot of {url}")
             
-            # Navigate with shorter timeout and better error handling
-            await page.goto(url, timeout=15000, wait_until="domcontentloaded")
+            # Navigate with longer timeout and better error handling
+            await page.goto(url, timeout=30000, wait_until="networkidle")
             
             # Wait a bit for page to load
             await asyncio.sleep(2)
