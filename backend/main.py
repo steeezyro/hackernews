@@ -34,8 +34,10 @@ async def lifespan(app: FastAPI):
         logger.error("GEMINI_API_KEY environment variable is required")
         raise ValueError("GEMINI_API_KEY is required")
     
+    logger.info(f"GEMINI_API_KEY loaded successfully: {api_key[:10]}...")
+    
     scraper = HackerNewsScraper(api_key)
-    cache = ArticleCache()
+    cache = ArticleCache("articles.db")
     
     # Create screenshots directory
     os.makedirs("screenshots", exist_ok=True)

@@ -1,5 +1,7 @@
 import json
 import sqlite3
+import os
+import glob
 from typing import List, Optional
 from datetime import datetime, timedelta
 import logging
@@ -36,6 +38,9 @@ class ArticleCache:
     def save_articles(self, articles: List[Article]) -> bool:
         """Save articles to database"""
         try:
+            # Ensure database is initialized
+            self._init_db()
+            
             with sqlite3.connect(self.db_path) as conn:
                 # Clear old articles (keep only latest batch)
                 conn.execute("DELETE FROM articles")
@@ -70,7 +75,7 @@ class ArticleCache:
                 conn.row_factory = sqlite3.Row
                 cursor = conn.execute("""
                     SELECT * FROM articles 
-                    ORDER BY created_at DESC
+                    ORDER BY created_at ASC
                 """)
                 
                 articles = []
@@ -142,3 +147,4 @@ class ArticleCache:
                 "successful_articles": 0,
                 "is_fresh": False
             }
+

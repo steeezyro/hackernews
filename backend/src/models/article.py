@@ -16,7 +16,7 @@ class Article:
         return {
             "title": self.title,
             "url": self.url,
-            "screenshot": f"/screenshots/{self.screenshot_path}" if self.screenshot_path else None,
+            "screenshot": self.screenshot_path if self.screenshot_path else None,
             "status": self.status,
             "summary": self.summary or "Summary not available.",
             "created_at": self.created_at.isoformat() if self.created_at else None,

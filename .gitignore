@@ -34,9 +34,6 @@ env/
 *.log
 app.log
 
-# Screenshots (optional - you might want to keep some for demo)
-screenshots/
-
 # Environment variables
 .env
 

@@ -17,7 +17,15 @@ export const useArticles = () => {
       setRefreshStatus(prev => ({ ...prev, error: null }));
       console.log('Fetching from:', `${API_BASE}/api/articles`);
       
-      let response = await fetch(`${API_BASE}/api/articles`);
+      // Force fresh data by adding cache-busting timestamp
+      const cacheBuster = new Date().getTime();
+      let response = await fetch(`${API_BASE}/api/articles?t=${cacheBuster}`, {
+        cache: 'no-cache',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
       console.log('Response status:', response.status);
       
       // If new endpoint fails, try legacy endpoint
@@ -37,6 +45,12 @@ export const useArticles = () => {
       // Handle both new format {articles: [...]} and old format [...]
       const articles = Array.isArray(data) ? data : (data.articles || []);
       console.log('Parsed articles:', articles);
+      console.log('First article debug:', articles[0] ? {
+        title: articles[0].title?.substring(0, 40),
+        status: articles[0].status,
+        screenshot: articles[0].screenshot,
+        hasScreenshot: !!articles[0].screenshot
+      } : 'No articles');
       
       setArticles(articles);
       setRefreshStatus(prev => ({ 
@@ -59,9 +73,15 @@ export const useArticles = () => {
     try {
       setRefreshStatus(prev => ({ ...prev, isRefreshing: true, error: null }));
       
+      // Clear current articles to force fresh render
+      setArticles([]);
+      
       const response = await fetch(`${API_BASE}/api/refresh`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache'
+        }
       });
 
       if (!response.ok) {
@@ -87,7 +107,7 @@ export const useArticles = () => {
         setTimeout(() => {
           fetchArticles();
           setRefreshStatus(prev => ({ ...prev, isRefreshing: false }));
-        }, 3000);
+        }, 5000); // Increased wait time to allow backend processing
       }
       
     } catch (error) {

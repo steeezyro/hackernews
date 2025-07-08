@@ -55,7 +55,7 @@ export const ArticleCard = ({ article, index }: ArticleCardProps) => {
       {article.status === "success" && article.screenshot ? (
         <div className="mb-4">
           <img
-            src={`${import.meta.env.VITE_API_URL}${article.screenshot}`}
+            src={`${import.meta.env.VITE_API_URL}${article.screenshot}?t=${article.updated_at || Date.now()}`}
             alt={article.title}
             className="w-full h-48 object-cover rounded-md"
             loading="lazy"

@@ -6,6 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 import google.generativeai as genai
 from datetime import datetime
 import os
+import glob
 
 from ..models.article import Article
 
@@ -18,23 +19,26 @@ class HackerNewsScraper:
         
         genai.configure(api_key=gemini_api_key)
         self.model = genai.GenerativeModel("models/gemini-1.5-flash-latest")
-        self.max_concurrent = 5
+        self.max_concurrent = 3  # Reduced for better stability
 
     async def scrape_top_stories(self) -> List[Article]:
-        """Scrape top 10 HackerNews stories with parallel processing"""
+        """Scrape top 10 HackerNews stories"""
         try:
+            # Clear old screenshots first
+            self._clear_old_screenshots()
+            
             async with async_playwright() as p:
                 browser = await p.chromium.launch(
                     headless=True,
-                    args=['--no-sandbox', '--disable-dev-shm-usage']
+                    args=['--no-sandbox', '--disable-dev-shm-usage', '--disable-web-security']
                 )
                 
                 # Get top story links
                 links = await self._get_story_links(browser)
                 logger.info(f"Found {len(links)} stories to process")
                 
-                # Process stories in parallel
-                articles = await self._process_stories_parallel(browser, links)
+                # Process stories sequentially to ensure proper numbering
+                articles = await self._process_stories_sequentially(browser, links)
                 
                 await browser.close()
                 return articles
@@ -42,6 +46,17 @@ class HackerNewsScraper:
         except Exception as e:
             logger.error(f"Scraping failed: {e}")
             raise
+
+    def _clear_old_screenshots(self):
+        """Remove all old screenshot files"""
+        screenshot_dir = "screenshots"
+        if os.path.exists(screenshot_dir):
+            for file in glob.glob(f"{screenshot_dir}/*.png"):
+                try:
+                    os.remove(file)
+                    logger.info(f"Removed old screenshot: {file}")
+                except Exception as e:
+                    logger.warning(f"Failed to remove {file}: {e}")
 
     async def _get_story_links(self, browser: Browser) -> List[Tuple[str, str]]:
         """Extract top 10 story links from HackerNews front page"""
@@ -64,10 +79,9 @@ class HackerNewsScraper:
                     elif url and url.startswith("/"):
                         url = "https://news.ycombinator.com" + url
                     elif url and not url.startswith("http"):
-                        # Skip invalid URLs
                         continue
                     
-                    if url:  # Only add if we have a valid URL
+                    if url:
                         links.append((title, url))
             
             return links
@@ -75,43 +89,33 @@ class HackerNewsScraper:
         finally:
             await page.close()
 
-    async def _process_stories_parallel(self, browser: Browser, links: List[Tuple[str, str]]) -> List[Article]:
-        """Process stories in parallel with rate limiting"""
-        semaphore = asyncio.Semaphore(self.max_concurrent)
+    async def _process_stories_sequentially(self, browser: Browser, links: List[Tuple[str, str]]) -> List[Article]:
+        """Process stories one by one maintaining HackerNews ranking order"""
+        articles = []
         
-        async def process_single_story(idx: int, title: str, url: str) -> Article:
-            async with semaphore:
-                return await self._process_single_story(browser, idx, title, url)
-        
-        tasks = [
-            process_single_story(idx, title, url) 
-            for idx, (title, url) in enumerate(links)
-        ]
-        
-        articles = await asyncio.gather(*tasks, return_exceptions=True)
-        
-        # Filter out exceptions and log them
-        valid_articles = []
-        for i, article in enumerate(articles):
-            if isinstance(article, Exception):
-                logger.error(f"Failed to process story {i+1}: {article}")
+        for idx, (title, url) in enumerate(links):
+            article_number = idx + 1  # Keep original order: 1, 2, 3, ..., 10
+            logger.info(f"Processing HackerNews article #{article_number}: {title}")
+            
+            try:
+                article = await self._process_single_story(browser, article_number, title, url)
+                articles.append(article)
+            except Exception as e:
+                logger.error(f"Failed to process article #{article_number}: {e}")
                 # Create failed article
-                title, url = links[i] if i < len(links) else ("Unknown", "")
-                valid_articles.append(Article(
+                failed_article = Article(
                     title=title,
                     url=url,
                     status="failed",
-                    created_at=datetime.now()
-                ))
-            else:
-                valid_articles.append(article)
+                    created_at=datetime.now(),
+                    updated_at=datetime.now()
+                )
+                articles.append(failed_article)
         
-        return valid_articles
+        return articles
 
-    async def _process_single_story(self, browser: Browser, idx: int, title: str, url: str) -> Article:
+    async def _process_single_story(self, browser: Browser, article_number: int, title: str, url: str) -> Article:
         """Process a single story: screenshot + summary"""
-        logger.info(f"Processing story {idx}: {title}")
-        
         article = Article(
             title=title,
             url=url,
@@ -119,75 +123,53 @@ class HackerNewsScraper:
             created_at=datetime.now()
         )
         
-        page_content = None
-        
-        # Try screenshot and extract content with better error handling
-        try:
-            screenshot_success, content = await self._take_screenshot_and_extract_content(browser, idx + 1, url)
-            if screenshot_success:
-                article.screenshot_path = f"{idx + 1}.png"
-                article.status = "success"
-                page_content = content
-            else:
-                article.status = "screenshot_failed"
-        except Exception as e:
-            logger.error(f"Screenshot processing failed for {title}: {e}")
+        # Take screenshot
+        screenshot_success = await self._take_screenshot(browser, article_number, url)
+        if screenshot_success:
+            article.screenshot_path = f"/screenshots/{article_number}.png"
+            article.status = "success"
+        else:
             article.status = "screenshot_failed"
         
-        # Try summary with better error handling
+        # Generate summary
         try:
-            summary = await self._generate_summary(title, page_content)
+            summary = await self._generate_summary(title)
             article.summary = summary
         except Exception as e:
-            logger.warning(f"Summary generation failed for {title}: {e}")
-            article.summary = "AI summary temporarily unavailable (API key issue)."
+            logger.error(f"Summary generation failed for {title}: {e}")
+            if "429" in str(e) and "quota" in str(e).lower():
+                article.summary = f"AI summary temporarily unavailable due to API quota limits."
+            else:
+                article.summary = f"Unable to generate AI summary. Content analysis temporarily unavailable."
         
         article.updated_at = datetime.now()
         return article
 
-    async def _take_screenshot_and_extract_content(self, browser: Browser, idx: int, url: str) -> tuple[bool, str]:
-        """Take screenshot of a single article and extract page content"""
-        page = await browser.new_page()
+    async def _take_screenshot(self, browser: Browser, article_number: int, url: str) -> bool:
+        """Take a clean screenshot of a single article"""
+        # Create new context for each screenshot to ensure isolation
+        context = await browser.new_context(
+            viewport={'width': 1200, 'height': 800},
+            ignore_https_errors=True
+        )
+        
+        page = await context.new_page()
+        
         try:
-            # Set viewport for consistent screenshots
-            await page.set_viewport_size({"width": 1200, "height": 800})
+            logger.info(f"Taking screenshot #{article_number} of {url}")
             
-            logger.info(f"Taking screenshot of {url}")
-            
-            # Navigate with longer timeout and better error handling
+            # Navigate to page
             await page.goto(url, timeout=30000, wait_until="networkidle")
             
-            # Wait a bit for page to load
-            await asyncio.sleep(2)
+            # Wait for page to fully load
+            await asyncio.sleep(3)
             
-            # Extract page content for summary
-            page_content = ""
-            try:
-                # Try to extract readable text from the page
-                content = await page.evaluate("""
-                    () => {
-                        // Remove script and style elements
-                        const scripts = document.querySelectorAll('script, style');
-                        scripts.forEach(el => el.remove());
-                        
-                        // Get text content and clean it up
-                        const text = document.body.innerText || document.body.textContent || '';
-                        
-                        // Clean up whitespace and limit length
-                        return text.replace(/\\s+/g, ' ').trim().substring(0, 3000);
-                    }
-                """)
-                page_content = content or ""
-                logger.info(f"Extracted {len(page_content)} characters of content")
-            except Exception as e:
-                logger.warning(f"Failed to extract content from {url}: {e}")
-                page_content = ""
-            
-            # Scroll to capture more content
-            await page.evaluate("window.scrollTo(0, Math.min(document.body.scrollHeight / 3, 1000))")
+            # Scroll slightly to capture more content
+            await page.evaluate("window.scrollTo(0, Math.min(document.body.scrollHeight / 4, 500))")
             await asyncio.sleep(1)
             
-            screenshot_path = f"screenshots/{idx}.png"
+            # Take screenshot
+            screenshot_path = f"screenshots/{article_number}.png"
             os.makedirs("screenshots", exist_ok=True)
             
             await page.screenshot(
@@ -198,28 +180,24 @@ class HackerNewsScraper:
             
             # Verify file was created
             if os.path.exists(screenshot_path):
-                logger.info(f"Screenshot saved successfully: {screenshot_path}")
-                return True, page_content
+                logger.info(f"Screenshot #{article_number} saved successfully")
+                return True
             else:
-                logger.warning(f"Screenshot file not created: {screenshot_path}")
-                return False, page_content
-            
+                logger.warning(f"Screenshot #{article_number} file not created")
+                return False
+                
         except Exception as e:
-            logger.warning(f"Screenshot failed for {url}: {type(e).__name__}: {e}")
-            return False, ""
+            logger.warning(f"Screenshot #{article_number} failed for {url}: {e}")
+            return False
         finally:
-            await page.close()
+            await context.close()
 
-    async def _generate_summary(self, title: str, page_content: str | None) -> str:
+    async def _generate_summary(self, title: str) -> str:
         """Generate AI summary for an article"""
         try:
-            # If no content was extracted, use title-based summary
-            if not page_content or len(page_content.strip()) < 50:
-                logger.info(f"No content extracted, using title-based summary for: {title}")
-                prompt = f"Based on this HackerNews article title: '{title}', provide a brief 2-3 sentence summary about what this article is likely about. Focus on the main topic and key points."
-            else:
-                # Use extracted content for summary
-                prompt = f"Please provide a 2-3 sentence summary of this article titled '{title}'. Here is the article content: {page_content[:2000]}..."
+            prompt = f"Based on this HackerNews article title: '{title}', provide a brief 2-3 sentence summary about what this article is likely about. Focus on the main topic and key points."
+            
+            logger.info(f"Generating AI summary for: {title}")
             
             # Use ThreadPoolExecutor for blocking Gemini API call
             loop = asyncio.get_event_loop()
@@ -230,12 +208,15 @@ class HackerNewsScraper:
                 )
             
             if response and hasattr(response, 'text') and response.text:
-                return response.text.strip()
+                summary = response.text.strip()
+                logger.info(f"Generated AI summary for {title}: {summary[:60]}...")
+                return summary
             else:
                 logger.warning(f"Empty response from Gemini for {title}")
                 return "Summary not available - API returned empty response."
             
         except Exception as e:
-            logger.warning(f"Summary generation failed for {title}: {e}")
-            # Fallback to basic title-based summary
-            return f"This article discusses {title.lower()}. Please visit the link for more details."
+            logger.error(f"Summary generation failed for {title}: {e}")
+            if "429" in str(e) and "quota" in str(e).lower():
+                return f"AI summary temporarily unavailable due to API quota limits."
+            return f"Unable to generate AI summary. Content analysis temporarily unavailable."
