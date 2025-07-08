@@ -58,10 +58,17 @@ class HackerNewsScraper:
                     title = await title_el.inner_text()
                     url = await title_el.get_attribute('href')
                     
+                    # Handle relative URLs
                     if url and url.startswith("item?"):
                         url = "https://news.ycombinator.com/" + url
+                    elif url and url.startswith("/"):
+                        url = "https://news.ycombinator.com" + url
+                    elif url and not url.startswith("http"):
+                        # Skip invalid URLs
+                        continue
                     
-                    links.append((title, url))
+                    if url:  # Only add if we have a valid URL
+                        links.append((title, url))
             
             return links
             
@@ -116,9 +123,9 @@ class HackerNewsScraper:
         
         # Try screenshot and extract content with better error handling
         try:
-            screenshot_success, content = await self._take_screenshot_and_extract_content(browser, idx, url)
+            screenshot_success, content = await self._take_screenshot_and_extract_content(browser, 10 - idx, url)
             if screenshot_success:
-                article.screenshot_path = f"{idx}.png"
+                article.screenshot_path = f"{10 - idx}.png"
                 article.status = "success"
                 page_content = content
             else:
@@ -230,4 +237,5 @@ class HackerNewsScraper:
             
         except Exception as e:
             logger.warning(f"Summary generation failed for {title}: {e}")
-            return "Summary not available due to processing error."
+            # Fallback to basic title-based summary
+            return f"This article discusses {title.lower()}. Please visit the link for more details."
