@@ -112,12 +112,15 @@ class HackerNewsScraper:
             created_at=datetime.now()
         )
         
-        # Try screenshot with better error handling
+        page_content = None
+        
+        # Try screenshot and extract content with better error handling
         try:
-            screenshot_success = await self._take_screenshot(browser, idx, url)
+            screenshot_success, content = await self._take_screenshot_and_extract_content(browser, idx, url)
             if screenshot_success:
                 article.screenshot_path = f"{idx}.png"
                 article.status = "success"
+                page_content = content
             else:
                 article.status = "screenshot_failed"
         except Exception as e:
@@ -126,7 +129,7 @@ class HackerNewsScraper:
         
         # Try summary with better error handling
         try:
-            summary = await self._generate_summary(url)
+            summary = await self._generate_summary(title, page_content)
             article.summary = summary
         except Exception as e:
             logger.warning(f"Summary generation failed for {title}: {e}")
@@ -135,8 +138,8 @@ class HackerNewsScraper:
         article.updated_at = datetime.now()
         return article
 
-    async def _take_screenshot(self, browser: Browser, idx: int, url: str) -> bool:
-        """Take screenshot of a single article"""
+    async def _take_screenshot_and_extract_content(self, browser: Browser, idx: int, url: str) -> tuple[bool, str]:
+        """Take screenshot of a single article and extract page content"""
         page = await browser.new_page()
         try:
             # Set viewport for consistent screenshots
@@ -149,6 +152,29 @@ class HackerNewsScraper:
             
             # Wait a bit for page to load
             await asyncio.sleep(2)
+            
+            # Extract page content for summary
+            page_content = ""
+            try:
+                # Try to extract readable text from the page
+                content = await page.evaluate("""
+                    () => {
+                        // Remove script and style elements
+                        const scripts = document.querySelectorAll('script, style');
+                        scripts.forEach(el => el.remove());
+                        
+                        // Get text content and clean it up
+                        const text = document.body.innerText || document.body.textContent || '';
+                        
+                        // Clean up whitespace and limit length
+                        return text.replace(/\\s+/g, ' ').trim().substring(0, 3000);
+                    }
+                """)
+                page_content = content or ""
+                logger.info(f"Extracted {len(page_content)} characters of content")
+            except Exception as e:
+                logger.warning(f"Failed to extract content from {url}: {e}")
+                page_content = ""
             
             # Scroll to capture more content
             await page.evaluate("window.scrollTo(0, Math.min(document.body.scrollHeight / 3, 1000))")
@@ -166,36 +192,42 @@ class HackerNewsScraper:
             # Verify file was created
             if os.path.exists(screenshot_path):
                 logger.info(f"Screenshot saved successfully: {screenshot_path}")
-                return True
+                return True, page_content
             else:
                 logger.warning(f"Screenshot file not created: {screenshot_path}")
-                return False
+                return False, page_content
             
         except Exception as e:
             logger.warning(f"Screenshot failed for {url}: {type(e).__name__}: {e}")
-            return False
+            return False, ""
         finally:
             await page.close()
 
-    async def _generate_summary(self, url: str) -> str:
+    async def _generate_summary(self, title: str, page_content: str | None) -> str:
         """Generate AI summary for an article"""
         try:
+            # If no content was extracted, use title-based summary
+            if not page_content or len(page_content.strip()) < 50:
+                logger.info(f"No content extracted, using title-based summary for: {title}")
+                prompt = f"Based on this HackerNews article title: '{title}', provide a brief 2-3 sentence summary about what this article is likely about. Focus on the main topic and key points."
+            else:
+                # Use extracted content for summary
+                prompt = f"Please provide a 2-3 sentence summary of this article titled '{title}'. Here is the article content: {page_content[:2000]}..."
+            
             # Use ThreadPoolExecutor for blocking Gemini API call
             loop = asyncio.get_event_loop()
             with ThreadPoolExecutor() as executor:
                 response = await loop.run_in_executor(
                     executor,
-                    lambda: self.model.generate_content(
-                        f"Please provide a 2-3 sentence summary of this URL: {url}. Focus on the main topic and key points."
-                    )
+                    lambda: self.model.generate_content(prompt)
                 )
             
             if response and hasattr(response, 'text') and response.text:
                 return response.text.strip()
             else:
-                logger.warning(f"Empty response from Gemini for {url}")
+                logger.warning(f"Empty response from Gemini for {title}")
                 return "Summary not available - API returned empty response."
             
         except Exception as e:
-            logger.warning(f"Summary generation failed for {url}: {e}")
+            logger.warning(f"Summary generation failed for {title}: {e}")
             return "Summary not available due to processing error."
